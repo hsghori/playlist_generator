@@ -1,0 +1,16 @@
+@import '../js/node_modules/styledot/scss/main';
+
+body {
+	background-color: $gray1;
+}
+
+.outer-container {
+	background-color: $white;
+	width: 65%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.hide {
+	display: none;
+}

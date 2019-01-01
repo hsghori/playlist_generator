@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "axios": "^0.18.0",
+    "browserify": "^16.2.3",
+    "require": "^2.4.20",
+    "sass": "^1.15.2",
+    "styledot": "^0.1.543",
+    "vue": "^2.5.21"
+  },
+  "browser": {
+    "vue": "vue/dist/vue.common.js"
+  }
+}

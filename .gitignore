@@ -1,0 +1,5 @@
+db.sqlite3
+**/node_modules
+**/constants.py
+.DS_Store
+**/*.pyc

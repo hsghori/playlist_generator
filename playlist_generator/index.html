@@ -1,0 +1,40 @@
+{% load static %}
+
+<link href={% static "css/main.css" %} rel="stylesheet" type="text/css"/>
+
+<div class="outer-container">
+	<div 
+		class="sd-card sd-elevation-1 info-module {% if spotify_token %}hide{% endif %}" 
+		id="auth-module">
+		<p>
+			This is a small web application that uses LastFM music scrubble data to generate a 
+			playlist based on your most listened to tracks over the past week. To do this we 
+			need to access your information from spotify. 
+		<a class="sd-button" 
+		   v-bind:href="[[ spotify_auth_link ]]"
+		   v-bind:class="{ 'disabled': !spotify_auth_link }">
+			Link spotify
+		</a>
+	</div>
+	<div 
+		class="sd-card sd-elevation-1 info-module {% if not spotify_token %}hide{% endif %}" 
+		id="info-module">
+		<combined-form-input
+			v-bind='lastfm_username_input'
+			v-model='lastfm_username'>
+		</combined-form-input>
+		<combined-form-input
+			v-bind='playlist_name_input'
+			v-model='playlist_name'>
+		</combined-form-input>
+		<button v-on:click="submitForm" class="sd-button">
+			Generate
+		</button>
+	</div>
+</div>
+
+<script>
+	let spotify_token = `{{ spotify_token }}`;
+</script>
+
+<script src={% static "js/bundle.js" %}></script>
