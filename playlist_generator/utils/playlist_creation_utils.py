@@ -8,15 +8,22 @@ from playlist_generator.utils.lastfm import LastFM
 def get_playlist_tracks(lastfm_username):
     lfm = LastFM(LASTFM_API_KEY)
     tracks = lfm.get_user_top_tracks(lastfm_username, limit=10, period='7day')
-    exclusion_artists = {artist['name'] for artist in lfm.get_top_artists(
-        lastfm_username, keys=['name'], limit=100)}
+    exclusion_artists = {
+        artist['name']
+        for artist in lfm.get_top_artists(lastfm_username, keys=['name'], limit=100)
+        if 'error' not in artist
+    }
     top_artists, playlist = set(), set()
     for track in tracks:
-        artists = [artist['name'] for artist in lfm.get_similar_artists(
-            track['artist']['name'], keys=['name'], limit=10)]
-        top_artists.update(
-            {artist for artist in artists if artist not in exclusion_artists}
-        )
+        if 'error' not in track:
+            artists = [
+                artist['name']
+                for artist in lfm.get_similar_artists(track['artist']['name'], keys=['name'], limit=10)
+                if 'error' not in artist
+            ]
+            top_artists.update(
+                {artist for artist in artists if artist not in exclusion_artists}
+            )
     for artist in top_artists:
         tracks = [
             track['name']

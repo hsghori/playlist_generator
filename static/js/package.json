@@ -2,6 +2,8 @@
   "dependencies": {
     "axios": "^0.18.0",
     "browserify": "^16.2.3",
+    "jquery": "^3.3.1",
+    "js-cookie": "^2.2.0",
     "require": "^2.4.20",
     "sass": "^1.15.2",
     "styledot": "^0.1.543",
