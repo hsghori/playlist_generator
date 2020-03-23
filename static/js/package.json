@@ -2,7 +2,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "browserify": "^16.2.3",
-    "jquery": "^3.3.1",
+    "jquery": "^3.4.0",
     "js-cookie": "^2.2.0",
     "require": "^2.4.20",
     "sass": "^1.15.2",
