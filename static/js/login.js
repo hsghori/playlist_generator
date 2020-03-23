@@ -2,13 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Cookies from 'js-cookie';
 import axios from 'axios';
-import { App } from './components/app';
+import { Login } from './components/login';
 
 axios.defaults.headers.common = {
     'X-CSRFToken': Cookies.get('csrftoken'),
 };
 
 ReactDOM.render(
-    <App />,
+    <Login authUrl={spotifyAuthUrl} />,
     document.getElementById('app'),
 );

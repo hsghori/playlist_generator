@@ -15,7 +15,6 @@ class LastFM:
     def get_user_top_tracks(self, user, keys=None, **query_params):
         """
         Gets the top tracks for a specific user.
-
         :param user: The username
         :type user: str
         :param keys: Any specific keys to query for, defaults to None
@@ -32,7 +31,6 @@ class LastFM:
     def get_top_artists(self, user, keys=None, **query_params):
         """
         Gets the top artists for a specific user.
-
         :param user: The username
         :type user: str
         :param keys: Any specific keys to query for, defaults to None
@@ -48,7 +46,6 @@ class LastFM:
     def get_similar_artists(self, artist, keys=None, **query_params):
         """
         Gets artists similar to a specific artist.
-
         :param user: The username
         :type user: str
         :param keys: Any specific keys to query for, defaults to None
@@ -64,7 +61,6 @@ class LastFM:
     def get_top_tracks_by_artist(self, artist, keys=None, **query_params):
         """
         Gets the top tracks for a specific artist.
-
         :param user: The username
         :type user: str
         :param keys: Any specific keys to query for, defaults to None
