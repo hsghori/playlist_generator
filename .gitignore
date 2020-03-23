@@ -1,5 +1,11 @@
 db.sqlite3
-**/node_modules
+node_modules
 **/constants.py
 .DS_Store
 **/*.pyc
+.vscode/
+.venv/
+.idea/
+*.env
+**/bundles/
+webpack-stats.json

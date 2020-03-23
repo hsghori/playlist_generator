@@ -1,12 +1,11 @@
 from random import shuffle
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOauthError
-from playlist_generator.utils.constants import LASTFM_API_KEY
 from playlist_generator.utils.lastfm import LastFM
 
 
-def get_playlist_tracks(lastfm_username):
-    lfm = LastFM(LASTFM_API_KEY)
+def get_playlist_tracks(last_fm_key, lastfm_username):
+    lfm = LastFM(last_fm_key)
     tracks = lfm.get_user_top_tracks(lastfm_username, limit=10, period='7day')
     exclusion_artists = {
         artist['name']
@@ -69,7 +68,12 @@ def create_playlist(token, track_titles, playlist_name='test'):
             playlist_track_info.append({
                 'title': valid_track_dict['name'],
                 'artists': ', '.join([artist['name'] for artist in valid_track_dict['artists']]),
-                'link': valid_track_dict['external_urls']['spotify']
+                'link': valid_track_dict['external_urls']['spotify'],
+                'image': valid_track_dict['album']['images'][0]
             })
     spotify.user_playlist_add_tracks(spotify_username, playlist_id, track_uris)
-    return playlist_track_info
+    return {
+        'url': playlist['external_urls'].get('spotify'),
+        'name': playlist.get('name'),
+        'track_info': playlist_track_info
+    }

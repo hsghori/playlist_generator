@@ -1,0 +1,12 @@
+{% extends 'playlist_generator/base.html' %}
+{% load render_bundle from webpack_loader %}
+
+{% block content %}
+    <div id="app"></div>
+
+    <script>
+        const spotifyAuthUrl = '{{ spotify_auth_url|safe }}';
+    </script>
+
+    {% render_bundle 'main' 'js' %}
+{% endblock %}
