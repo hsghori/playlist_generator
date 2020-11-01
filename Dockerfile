@@ -15,6 +15,10 @@ RUN make npm_install
 COPY .babelrc /app/
 COPY webpack.config.js /app/
 COPY static/ /app/static/
-COPY generator /app/generator/
+ADD generator /app/
+EXPOSE 8000
 
-ENTRYPOINT bash -c "make build_static && make migrate && make start_server"
+RUN make build_static
+RUN make migrate
+
+CMD gunicorn generator.wsgi:application --bind 0.0.0.0:$PORT
