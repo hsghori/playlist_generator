@@ -1,4 +1,6 @@
-DJANGO_EXE=generator/manage.py
+DJANGO_EXE=manage.py
+IMAGE_NAME=web
+CONTAINER_NAME=playlist_generator
 
 all:
 	make python_install
@@ -8,16 +10,26 @@ all:
 	make migrate
 
 start:
-	@docker-compose up
+	docker run -d --name ${CONTAINER_NAME} -e "PORT=8765" -e "DEBUG=1" --env-file secrets.env -p 8000:8765 ${IMAGE_NAME}:latest
+
+stop:
+	docker stop ${CONTAINER_NAME}
+
+down:
+	docker rm --force ${CONTAINER_NAME}
 
 build:
-	@docker-compose build
+	docker build -t ${IMAGE_NAME}:latest .
+
+release:
+	heroku container:push ${IMAGE_NAME}
+	heroku container:release -a blooming-castle-70683 ${IMAGE_NAME}
+
+logs:
+	@docker logs ${CONTAINER_NAME} --follow
 
 shell:
-	@docker exec -ti playlist_generator bash
-
-make start_server:
-	@python ${DJANGO_EXE} runserver 0.0.0.0:8000
+	@docker exec -ti ${IMAGE_NAME} bash
 
 migrate:
 	@python ${DJANGO_EXE} migrate
@@ -34,6 +46,7 @@ watch_css:
 build_static:
 	@npm run build:js
 	@npm run build:css
+	@python ${DJANGO_EXE} collectstatic
 
 python_install:
 	@pip install -r requirements.txt

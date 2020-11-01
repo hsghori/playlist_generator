@@ -8,9 +8,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import View, TemplateView
-from .utils.playlist_creation import get_playlist_tracks, create_playlist
+from .utils.playlist_creation import create_playlist
+
 
 SPOTIFY_SCOPES = ' '.join([
+    'user-top-read',
     'user-read-email',
     'playlist-read-private',
     'playlist-modify-private',
@@ -75,17 +77,15 @@ class PlaylistGenerateView(View):
 
     def post(self, request):
         params = json.loads(request.body)
-        lastfm_username = params.get('lastfm_username')
         playlist_name = params.get('playlist_name')
         spotify_token = request.session.get('token')
 
-        if not (lastfm_username and playlist_name and spotify_token):
-            error_message = 'Bad request\nLastFM Username: %s\nPlaylist Name: %s\nSpotify token%s' % (
-                lastfm_username, playlist_name, spotify_token)
+        if not (playlist_name and spotify_token):
+            error_message = 'Bad request\nPlaylist Name: %s\nSpotify token%s' % (
+                playlist_name, spotify_token)
             return JsonResponse({'error': error_message}, status=400)
 
-        playlist_tracks = get_playlist_tracks(settings.LASTFM_API_KEY, lastfm_username)
-        playlist_response = create_playlist(spotify_token, playlist_tracks, playlist_name)
+        playlist_response = create_playlist(spotify_token, playlist_name)
         if 'error' in playlist_response:
             return JsonResponse(playlist_response, 500)
 

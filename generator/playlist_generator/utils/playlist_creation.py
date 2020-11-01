@@ -1,39 +1,9 @@
 from random import shuffle
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOauthError
-from playlist_generator.utils.lastfm import LastFM
 
 
-def get_playlist_tracks(last_fm_key, lastfm_username):
-    lfm = LastFM(last_fm_key)
-    tracks = lfm.get_user_top_tracks(lastfm_username, limit=10, period='7day')
-    exclusion_artists = {
-        artist['name']
-        for artist in lfm.get_top_artists(lastfm_username, keys=['name'], limit=100)
-        if 'error' not in artist
-    }
-    top_artists, playlist = set(), set()
-    for track in tracks:
-        if 'error' not in track:
-            artists = [
-                artist['name']
-                for artist in lfm.get_similar_artists(track['artist']['name'], keys=['name'], limit=10)
-                if 'error' not in artist
-            ]
-            top_artists.update(
-                {artist for artist in artists if artist not in exclusion_artists}
-            )
-    for artist in top_artists:
-        tracks = [
-            track['name']
-            for track in lfm.get_top_tracks_by_artist(artist, keys=['name'], limit=2)
-            if 'error' not in track
-        ]
-        playlist.update(tracks)
-    return list(playlist)
-
-
-def create_playlist(token, track_titles, playlist_name='test'):
+def create_playlist(token, playlist_name='test'):
     if not token:
         return {'error': 'Invalid token'}
 
@@ -45,33 +15,42 @@ def create_playlist(token, track_titles, playlist_name='test'):
     if not spotify_username:
         return {'error': 'Could not find spotify user'}
 
+    top_tracks = spotify.current_user_top_tracks(
+        time_range='short_term').get("items", [])
+    base_artist_ids = {
+        artist["id"] for track in top_tracks for artist in track["artists"]
+    }
+    artist_ids = set()
+    for artist_id in base_artist_ids:
+        artists = spotify.artist_related_artists(artist_id).get("artists", [])
+        artist_ids = artist_ids.union(set([
+            artist["id"] for artist in artists[:5]
+        ]))
+
+    potential_tracks = {}
+    for artist_id in artist_ids:
+        tracks = spotify.artist_top_tracks(artist_id).get("tracks", [])
+        potential_tracks.update({
+            track["uri"]: track for track in tracks[:5]
+        })
+
+    playlist_track_uris = list(potential_tracks.keys())
+    shuffle(playlist_track_uris)
+    playlist_track_uris = playlist_track_uris[:100]
+    playlist_track_info = []
+    for uri in playlist_track_uris:
+        track = potential_tracks[uri]
+        playlist_track_info.append({
+            'title': track['name'],
+            'artists': ', '.join([artist['name'] for artist in track['artists']]),
+            'link': track['external_urls']['spotify'],
+            'image': track['album']['images'][0]
+        })
+
     playlist = spotify.user_playlist_create(
         spotify_username, playlist_name, public=False)
-    playlist_id = playlist['id']
-    track_uris = []
-    shuffle(track_titles)
-    track_titles = track_titles[:100] \
-        if len(track_titles) > 100 \
-        else track_titles
-    playlist_track_info = []
-    for track in track_titles:
-        track_dict = spotify.search(track, limit=1, type='track')
-        is_valid_track = (
-            'tracks' in track_dict and
-            'items' in track_dict['tracks'] and
-            len(track_dict['tracks']['items']) > 0 and
-            'uri' in track_dict['tracks']['items'][0]
-        )
-        if is_valid_track:
-            valid_track_dict = track_dict['tracks']['items'][0]
-            track_uris.append(valid_track_dict['uri'])
-            playlist_track_info.append({
-                'title': valid_track_dict['name'],
-                'artists': ', '.join([artist['name'] for artist in valid_track_dict['artists']]),
-                'link': valid_track_dict['external_urls']['spotify'],
-                'image': valid_track_dict['album']['images'][0]
-            })
-    spotify.user_playlist_add_tracks(spotify_username, playlist_id, track_uris)
+    spotify.user_playlist_add_tracks(
+        spotify_username, playlist["id"], playlist_track_uris)
     return {
         'url': playlist['external_urls'].get('spotify'),
         'name': playlist.get('name'),
