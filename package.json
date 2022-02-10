@@ -22,7 +22,7 @@
         "clean-webpack-plugin": "^3.0.0",
         "css-loader": "^3.4.2",
         "fibers": "^4.0.1",
-        "node-sass": "^4.12.0",
+        "node-sass": "^7.0.0",
         "react-modal": "^3.10.1",
         "sass": "^1.23.0",
         "sass-loader": "^8.0.0",
